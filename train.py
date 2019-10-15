@@ -44,6 +44,11 @@ def time_string():
 
 
 def train(log_dir, args):
+  if args.restore_dir:
+    assert args.restore_step, "If restore_dir is set, restore_step also must be set."
+    log_dir = args.restore_dir
+  else:
+    log_dir = os.path.join(log_dir, str(int(time.time())))
   commit = get_git_commit() if args.git else 'None'
   checkpoint_path = os.path.join(log_dir, 'model.ckpt')
   input_path = os.path.join(args.base_dir, args.input)
@@ -132,6 +137,7 @@ def main():
   parser.add_argument('--hparams', default='',
     help='Hyperparameter overrides as a comma-separated list of name=value pairs')
   parser.add_argument('--restore_step', type=int, help='Global step to restore from checkpoint.')
+  parser.add_argument('--restore_dir', help='Directory to restore from checkpoint.')
   parser.add_argument('--summary_interval', type=int, default=100,
     help='Steps between running summary ops.')
   parser.add_argument('--checkpoint_interval', type=int, default=1000,
